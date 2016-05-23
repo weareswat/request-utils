@@ -1,4 +1,4 @@
-(ns ^{:added "0.1.0" :author "Marcos Lamúria"}
+(ns ^{:added "0.2.0" :author "Marcos Lamúria"}
   request-utils.core
   (:require [cheshire.core :as json]
             [clojure.string :as clj-str]
@@ -107,7 +107,7 @@
     (merge {:success (get-success response)
             :status (:status response)
             :requests (inc (:requests data))}
-           (json/parse-string (slurp (:body response)) true))
+            {:body (json/parse-string (slurp (:body response)) true)})
     (catch Exception ex
       {:exception ex})))
 
