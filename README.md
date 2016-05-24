@@ -12,7 +12,7 @@ Installation
 With Leiningen/Boot:
 
 ```clojure
-[weareswat/request-utils "0.1.0"]
+[weareswat/request-utils "0.2.0"]
 ```
 
 ### Operations
