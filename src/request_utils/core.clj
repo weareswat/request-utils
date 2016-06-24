@@ -49,13 +49,15 @@
   (assoc http-ops :body (parse-body data)))
 
 (defn prepare-data
-  "Prepares all the data to do the request. This function receives two parameters
-  method and data.
-  The method can be http reques methods:
+  "Prepares all the data to do the request. This function receives the HTTP
+  method and the data to send as parameters.
+
+  The method can be http request methods:
     * :get
     * :put
     * :post
     * :delete
+
   As you can see in the following example the data is a map with all data
   related with the request:
     {:host 'http://api.fake.com'
@@ -68,7 +70,10 @@
   Only the host is required. It's mandatory to have the protocol and
   the host together.
   Valid :host value: http://api.fake.com
-  Invalid :host value: api.fake.com"
+  Invalid :host value: api.fake.com
+
+  By default, the response body will be serialized to json. You can pass
+  :plain-body? true to just return it as a string."
   [data method]
   (let [http-opts (-> (add-headers (:headers data) (:http-opts data))
                       (assoc :throw-exceptions? false)
@@ -100,6 +105,13 @@
     (or (= \2 first-char)
         (= \3 first-char) )))
 
+(defn- get-body
+  "Gets the body and parses it if necessary. By default loads from json"
+  [data response]
+  (cond
+    (:plain-body? data) (slurp (:body response))
+    :else (json/parse-string (slurp (:body response)) true)))
+
 (defn- prepare-response
   "Handles post-response"
   [data response]
@@ -107,9 +119,9 @@
     (merge {:success (get-success response)
             :status (:status response)
             :requests (inc (:requests data))}
-            {:body (json/parse-string (slurp (:body response)) true)})
+            {:body (get-body data response)})
     (catch Exception ex
-      {:exception ex})))
+      (result/exception ex))))
 
 (defn- prepare-error
   "Handles post-response errors"
