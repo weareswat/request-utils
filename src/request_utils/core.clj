@@ -3,10 +3,15 @@
   (:require [cheshire.core :as json]
             [clojure.string :as clj-str]
             [ring.util.codec :as codec]
+            [environ.core :refer [env]]
             [result.core :as result]
             [clojure.core.async :refer [chan <!! >!! close! go <! timeout]]
             [manifold.deferred :as d]
             [aleph.http :as http]))
+
+(def ^:const default-timeout (Integer/parseInt
+                                   (or (env :request-utils-default-timeout)
+                                       (str (* 10 1000)))))
 
 (defn url-encode
   [query-params]
@@ -77,6 +82,8 @@
   [data method]
   (let [http-opts (-> (add-headers (:headers data) (:http-opts data))
                       (assoc :throw-exceptions? false)
+                      (assoc :connection-timeout (:connection-timeout data))
+                      (assoc :request-timeout (get data :request-timeout default-timeout))
                       (add-body (:body data)))]
     (assoc data :host (:host data)
                 :requests 0
