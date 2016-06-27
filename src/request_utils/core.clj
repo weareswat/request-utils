@@ -118,6 +118,7 @@
   (try
     (merge {:success (get-success response)
             :status (:status response)
+            :request-time (:request-time response)
             :requests (inc (:requests data))}
             {:body (get-body data response)})
     (catch Exception ex
