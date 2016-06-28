@@ -110,8 +110,13 @@
 
 (deftest http-get
   (let [result (<!! (core/http-get {:host "http://app.clanhr.com/directory-api/"}))]
-    (is (= 200
-           (:status result)))))
+    (is (= 200 (:status result)))
+    (is (:request-time result))))
+
+(deftest http-get-timeout
+  (let [result (<!! (core/http-get {:host "http://app.clanhr.com/directory-api/"
+                                    :request-timeout 0}))]
+    (is (= 408 (:status result)))))
 
 (deftest http-get-non-json-response
   (let [result (<!! (core/http-get {:host "http://www.google.com"
