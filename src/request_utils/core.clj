@@ -112,12 +112,29 @@
     (or (= \2 first-char)
         (= \3 first-char) )))
 
+(defn sanitize-json
+  "Sometimes json may have weird characters. Let's uniformize that"
+  [raw]
+  (clojure.string/replace raw (str (char 65279)) ""))
+
+(defn- parse-json
+  "Parses the body as json"
+  [response]
+  (let [raw (-> (slurp (:body response))
+                (sanitize-json))]
+    (try
+      (json/parse-string raw true)
+      (catch Exception ex
+        (throw (ex-info "Error parsing json"
+                        (assoc response :body raw)
+                        ex))))))
+
 (defn- get-body
   "Gets the body and parses it if necessary. By default loads from json"
   [data response]
   (cond
     (:plain-body? data) (slurp (:body response))
-    :else (json/parse-string (slurp (:body response)) true)))
+    :else (parse-json response)))
 
 (defn- prepare-response
   "Handles post-response"

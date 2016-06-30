@@ -122,3 +122,10 @@
   (let [result (<!! (core/http-get {:host "http://www.google.com"
                                     :plain-body? true}))]
     (is (= 200 (:status result)))))
+
+(deftest invalid-json-proper-error
+  (let [result (<!! (core/http-get {:host "http://www.google.com"}))]
+    (is (result/failed? result))))
+
+(deftest sanitize-json-test
+  (is (= "\"Hello" (core/sanitize-json (str "\"Hello" (char 65279))))))
