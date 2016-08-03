@@ -1,4 +1,4 @@
-(defproject weareswat/request-utils "0.4.1"
+(defproject weareswat/request-utils "0.5.0"
   :description "Some utilities to do async http requests with aleph"
   :url "https://github.com/weareswat/request-utils"
   :license {:name         "MIT"
