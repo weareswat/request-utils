@@ -148,6 +148,13 @@
     (catch Exception ex
       (result/exception ex))))
 
+(defn- response-body
+  "Sluprs the :body of m, if available"
+  [response]
+  (if-let [raw (:body (.getData response))]
+    (slurp raw)
+    ""))
+
 (defn- prepare-error
   "Handles post-response errors"
   [data response]
@@ -159,15 +166,18 @@
        :request-time (-> data :http-opts :request-timeout)
        :requests (inc (:requests data))
        :data {:message "Timed out"}}
+
       (instance? clojure.lang.ExceptionInfo response)
-      (merge {:status (.getMessage response)
-              :error (str "Error getting " (:url data))
-              :requests (inc (:requests data))
-              :request-time (:request-time (.getData response))}
-             (json/parse-string (slurp (:body (.getData response))) true))
+      {:status (.getMessage response)
+       :error (str "Error getting " (:url data))
+       :requests (inc (:requests data))
+       :request-time (:request-time (.getData response))
+       :body (response-body response)}
+
       (instance? Throwable response)
       {:error (str "Error getting " (:url data))
        :caused-by response}
+
       :else
       (-> response
           (assoc :error (str "Error getting " (:url data)))
