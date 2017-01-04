@@ -116,6 +116,13 @@
 (deftest http-get-timeout
   (let [result (<!! (core/http-get {:host "http://app.clanhr.com/directory-api/"
                                     :request-timeout 0}))]
+    (is (= 3 (:requests result)))
+    (is (= 408 (:status result)))))
+
+(deftest http-get-timeout
+  (let [result (<!! (core/http-post {:host "http://app.clanhr.com/directory-api/"
+                                     :request-timeout 0}))]
+    (is (= 1 (:requests result)))
     (is (= 408 (:status result)))))
 
 (deftest http-get-non-json-response
