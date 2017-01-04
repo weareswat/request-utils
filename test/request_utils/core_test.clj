@@ -83,7 +83,7 @@
              (:host result))))
 
     (testing "retries"
-      (is (= 2
+      (is (= 0
              (:retries result))))
 
     (testing "url"
@@ -129,3 +129,8 @@
 
 (deftest sanitize-json-test
   (is (= "\"Hello" (core/sanitize-json (str "\"Hello" (char 65279))))))
+
+(deftest default-tries-test
+  (is (= 3 (core/default-tries :get)))
+  (is (= 1 (core/default-tries :post)))
+  (is (= 1 (core/default-tries :put))))

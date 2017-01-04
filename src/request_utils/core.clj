@@ -53,6 +53,13 @@
   [http-ops data]
   (assoc http-ops :body (parse-body data)))
 
+(defn default-tries
+  "Gets the default tries to execute based on the method"
+  [method]
+  (if (= method :get)
+    3
+    1))
+
 (defn prepare-data
   "Prepares all the data to do the request. This function receives the HTTP
   method and the data to send as parameters.
@@ -87,7 +94,8 @@
                       (add-body (:body data)))]
     (assoc data :host (:host data)
                 :requests 0
-                :retries (- (or (:retries data) 3) 1)
+                :retries (dec (or (:retries data)
+                                  (default-tries method)))
                 :url (build-url (:host data) (:path data) (:query-params data))
                 :http-opts http-opts
                 :request-method method
